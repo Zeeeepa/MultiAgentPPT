@@ -134,8 +134,11 @@ async def DocumentSearch(
     print(f"Agent{agent_name}正在调用工具：DocumentSearch: " + keyword)
     print("文档检索: " + keyword)
     result = ""
+    document_ids = []
     for i, doc in enumerate(Documents):
         result += f"# 文档id:{i}\n {doc}\n\n"
+        document_ids.append(i)
+    tool_context.state["document_ids"] = document_ids
     return result
 
 if __name__ == '__main__':
