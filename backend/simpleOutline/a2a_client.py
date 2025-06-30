@@ -19,7 +19,8 @@ async def httpx_client():
             'message': {
                 'role': 'user',
                 'parts': [{'type': 'text', 'text': prompt}],
-                'messageId': request_id
+                'messageId': request_id,
+                'metadata': {"user_data": "hello"}
             }
         }
         # 流式请求的示例
