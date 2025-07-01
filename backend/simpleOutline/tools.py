@@ -44,8 +44,40 @@ async def matchDiseaseBySymptoms(
     # 需要使用疾病症状和数据库进行向量匹配，然后使用大模型进行判断，是否是一个或者多个疾病。返回给前端疾病名称和症状。
     # 这里进行简化，直接使用这些症状和疾病数据库让大模型进行匹配。
     agent_name = tool_context.agent_name
-    print(f"Agent{agent_name}正在调用工具：matchDiseaseBySymptoms")
-    #
+    print(f"Agent {agent_name} 正在调用工具：matchDiseaseBySymptoms")
+    prompt = f"""
+你是一名医学诊断助手，擅长根据患者描述的症状，从已有疾病症状数据库中识别出最可能的相关疾病，并判断是否需要补充更多症状来明确诊断。
+
+以下是已知疾病及其典型症状的描述：
+
+```
+{disease_symptoms}
+```
+
+请根据患者提供的症状，分析并返回可能相关的疾病名称，按照与描述症状的匹配程度排序。
+
+**输出要求：**
+
+* 返回**多个可能的疾病名称**，并注明是否还需要其他症状以进一步确认。
+* 如果某种疾病的现有症状足以支持判断，请注明“不再需要其他症状判断”。
+* 如果还不能明确判断，请指出还需询问哪些关键症状来进一步确诊。
+
+**用户描述的症状如下：**
+
+```
+{symptoms}
+```
+
+**请输出如下格式：**
+
+```
+可能的疾病：
+1. 疾病名称A：建议进一步确认是否有【症状X、症状Y】，以排除其他疾病
+2. 疾病名称B：当前症状已足以判断，基本可以确定为该疾病
+3. 疾病名称C：建议确认是否伴随【症状Z】，以提高判断准确性
+```
+"""
+    result = query_deepseek(prompt)
     return result
 
 async def getTreatmentAdvice(disease_name: str, tool_context: ToolContext):
