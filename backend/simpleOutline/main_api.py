@@ -45,18 +45,18 @@ def main(host, port):
     streaming = os.environ.get("STREAMING") == "true"
     logger.info(f"流式模式: {streaming}")
 
-    agent_card_name = "outline Agent"
-    agent_name = "outline_agent"
+    agent_card_name = "Doctor Agent"
+    agent_name = "diagnosing_doctor"
     # Agent描述必须清晰
-    agent_description = "Generate an outline based on the user's requirements"
+    agent_description = "Based on the symptoms described by the patient, identify the possible disease and provide appropriate treatment recommendations."
 
     # 定义 agent 的技能
     skill = AgentSkill(
         id=agent_name,
         name=agent_card_name,
         description=agent_description,
-        tags=["outline"],
-        examples=["outline"],
+        tags=["doctor"],
+        examples=["doctor"],
     )
 
     # 构建 agent 卡片信息
