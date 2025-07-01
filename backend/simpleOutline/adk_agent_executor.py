@@ -67,11 +67,15 @@ class ADKAgentExecutor(AgentExecutor):
         session_id = session_obj.id
 
         async for event in self._run_agent(session_id, new_message):
-
             if event.is_final_response():
+                final_session = await self.runner.session_service.get_session(
+                    app_name=self.runner.app_name, user_id="self", session_id=session_id
+                )
+                print("最终的session中的结果final_session中的state: ", final_session.state)
+                final_metadata = final_session.state.get("metadata")
                 parts = convert_genai_parts_to_a2a(event.content.parts)
                 logger.debug("Yielding final response: %s", parts)
-                task_updater.add_artifact(parts)
+                task_updater.add_artifact(parts, metadata=final_metadata)
                 task_updater.complete()
                 break
             if not event.get_function_calls():

@@ -66,9 +66,22 @@ a2a_client.py 输出结果示例:
 Process finished with exit code 0
 ```
 
-# 底层元数据的流动过程
+# 底层metadata元数据的流动过程
 1. a2a_client.py ，payload中携带metadata,例如send_message_payload中
 
 2. adk_agent_executor.py中的async def execute的context.message.metadata获取到元数据，async def _process_request的await self._upsert_session在创建新的session时,把元数据放到state中，app_name=self.runner.app_name, user_id="self", session_id=session_id, state={"metadata":metadata}
 
 3. agent.py的before_model_callback中可以看到元数据, callback_context.state.get("metadata")
+
+4. 如果使用了工具，那么tool_context中的tool_context.state.get("metadata")可以获取到元数据，
+
+5. 工具调用时的原信息可以附近到metadata中， metadata["tool_document_ids"] = document_ids
+    tool_context.state["metadata"] = metadata
+
+6. agent.py的after_model_callback可以看到metadata = callback_context.state.get("metadata")信息，包括工具更新的结果。
+
+7. adk_agent_executor.py中中的async def _process_request的if event.is_final_response():中获取final_session = await self.runner.session_service.get_session(
+                    app_name=self.runner.app_name, user_id="self", session_id=session_id
+                )
+                print("最终的session中的结果final_session中的state: ", final_session.state)
+8. 最终的客户端打印出metadata, {'id': '57071402-98d3-459d-a447-cbdf384e8323', 'jsonrpc': '2.0', 'result': {'artifact': {'artifactId': '156b98ac-3aa6-412c-97e2-6dff3148c46b', 'metadata': {'user_data': 'hello', 'tool_document_ids': [0, 1, 2, 3]}, 'parts': [{'kind': 'text', 'text': '# 电动汽车全球市场概况\n- 全球销量持续增长，新兴市场表现突出\n- 中国引领全球电动汽车市场\n- 欧美市场增长放缓，面临挑战\n\n# 电动汽车技术与成本\n- 电池技术进步与成本下降\n- 充电基础设施的完善与创新\n- 电动卡车经济性改善，长途运输潜力显现\n\n# 电动汽车的消费者接受度\n- 消费者对电动汽车的接受度存在分化\n- 政策与补贴对消费者购买意愿的影响\n- 续航里程和电池衰减是消费者关注的重点'}]}, 'contextId': 'cdbf96d6-8a35-40e2-b3cd-e026c2c446f1', 'kind': 'artifact-update', 'taskId': '3d5160e2-42ef-4244-872f-e23046b685f1'}}

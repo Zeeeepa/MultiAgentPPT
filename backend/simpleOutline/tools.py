@@ -140,7 +140,8 @@ async def DocumentSearch(
     for i, doc in enumerate(Documents):
         result += f"# 文档id:{i}\n {doc}\n\n"
         document_ids.append(i)
-    tool_context.state["tool_document_ids"] = document_ids
+    metadata["tool_document_ids"] = document_ids
+    tool_context.state["metadata"] = metadata
     return result
 
 if __name__ == '__main__':

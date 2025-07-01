@@ -4,6 +4,8 @@ import random
 from google.adk.agents import Agent
 from google.adk.agents.callback_context import CallbackContext
 from google.adk.models import LlmRequest, LlmResponse
+from google.adk.tools.tool_context import ToolContext
+from google.adk.tools import BaseTool
 from typing import Dict, List, Any, AsyncGenerator, Optional, Union
 from create_model import create_model
 from tools import DocumentSearch
@@ -42,11 +44,19 @@ def after_model_callback(callback_context: CallbackContext, llm_response: LlmRes
     agent_name = callback_context.agent_name
     response_data = len(llm_response.content.parts)
     metadata = callback_context.state.get("metadata")
-    print(f"调用了{agent_name}模型后的callback, 这次模型回复{response_data}的信息,metadata数据为：{metadata}")
+    print(f"调用了{agent_name}模型后的callback, 这次模型回复{response_data}条信息,metadata数据为：{metadata}")
     #清空contents,不需要上一步的拆分topic的记录, 不能在这里清理，否则，每次调用工具都会清除记忆，白操作了
     # llm_request.contents.clear()
     # 返回 None，继续调用 LLM
     return None
+
+def after_tool_callback(
+    tool: BaseTool, args: Dict[str, Any], tool_context: ToolContext, tool_response: Dict
+) -> Optional[Dict]:
+
+  tool_name = tool.name
+  print(f"调用了{tool_name}工具后的callback, tool_response数据为：{tool_response}")
+  return None
 
 root_agent = Agent(
     name="outline_agent",
@@ -57,5 +67,6 @@ root_agent = Agent(
     instruction=instruction,
     before_model_callback=before_model_callback,
     after_model_callback=after_model_callback,
+    after_tool_callback=after_tool_callback,
     tools=[DocumentSearch],
 )
