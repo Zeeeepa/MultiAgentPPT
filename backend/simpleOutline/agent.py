@@ -31,7 +31,8 @@ def before_model_callback(callback_context: CallbackContext, llm_request: LlmReq
     # 1. 检查用户输入
     agent_name = callback_context.agent_name
     history_length = len(llm_request.contents)
-    print(f"调用了{agent_name} research Agent的callback, 现在Agent共有{history_length}条历史记录")
+    metadata = callback_context.state.get("metadata")
+    print(f"调用了{agent_name} research Agent的callback, 现在Agent共有{history_length}条历史记录,metadata数据为：{metadata}")
     #清空contents,不需要上一步的拆分topic的记录, 不能在这里清理，否则，每次调用工具都会清除记忆，白操作了
     # llm_request.contents.clear()
     # 返回 None，继续调用 LLM
