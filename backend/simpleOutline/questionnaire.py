@@ -1,5 +1,5 @@
-
 from google.adk.agents import LoopAgent, LlmAgent, BaseAgent
+from google.genai import types
 from google.adk.events import Event, EventActions
 from google.adk.agents.invocation_context import InvocationContext
 from typing import AsyncGenerator
@@ -24,7 +24,7 @@ class AskQuestion(BaseAgent):
         current_index = ctx.session.state.get("current_question_index", 0)
         if current_index < len(QUESTIONS):
             question = QUESTIONS[current_index]
-            yield Event(author=self.name, actions=EventActions(notify=f"Question {current_index + 1}: {question}"))
+            yield Event(author=self.name, actions=EventActions(), content=types.Content(parts=[types.Part(text=f"Question {current_index + 1}: {question}")]))
         yield Event(author=self.name, actions=EventActions())
 
 # 3. Agent to check the user's answer
