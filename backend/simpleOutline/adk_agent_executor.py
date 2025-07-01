@@ -52,12 +52,14 @@ class ADKAgentExecutor(AgentExecutor):
         new_message: types.Content,
         session_id: str,
         task_updater: TaskUpdater,
+        metadata: dict | None = None
     ) -> None:
         # The call to self._upsert_session was returning a coroutine object,
         # leading to an AttributeError when trying to access .id on it directly.
         # We need to await the coroutine to get the actual session object.
+        # metadata用户传入的原数据
         session_obj = await self._upsert_session(
-            session_id,
+            session_id,metadata
         )
         logger.debug(f"收到请求信息: {new_message}")
         # Update session_id with the ID from the resolved session object
@@ -100,6 +102,7 @@ class ADKAgentExecutor(AgentExecutor):
             ),
             context.context_id,
             updater,
+            metadata=context.message.metadata
         )
         logger.debug("[adk agent ] 执行完成，退出")
 
@@ -107,7 +110,7 @@ class ADKAgentExecutor(AgentExecutor):
         # Ideally: kill any ongoing tasks.
         raise ServerError(error=UnsupportedOperationError())
 
-    async def _upsert_session(self, session_id: str):
+    async def _upsert_session(self, session_id: str, metadata={}):
         """
         Retrieves a session if it exists, otherwise creates a new one.
         Ensures that async session service methods are properly awaited.
@@ -117,7 +120,7 @@ class ADKAgentExecutor(AgentExecutor):
         )
         if session is None:
             session = await self.runner.session_service.create_session(
-                app_name=self.runner.app_name, user_id="self", session_id=session_id
+                app_name=self.runner.app_name, user_id="self", session_id=session_id, state={"metadata":metadata}
             )
         # According to ADK InMemorySessionService, create_session should always return a Session object.
         if session is None:
