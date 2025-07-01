@@ -58,7 +58,7 @@ class FlowController(BaseAgent):
                 yield Event(author=self.name, actions=EventActions())
         else:
             # Repeat the current question
-            yield Event(author=self.name, actions=EventActions(notify="Please provide a more detailed answer."))
+            yield Event(author=self.name, actions=EventActions(), content=types.Content(parts=[types.Part(text=f"Please provide a more detailed answer.")]))
 
 # 5. The main loop for the questionnaire
 questionnaire_loop = LoopAgent(
