@@ -79,10 +79,10 @@ def after_tool_callback(
   return None
 
 root_agent = Agent(
-    name="outline_agent",
+    name="diagnosing_doctor",
     model=model,
     description=(
-        "generate outline"
+        "doctor"
     ),
     instruction=instruction,
     before_model_callback=before_model_callback,
