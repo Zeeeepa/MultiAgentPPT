@@ -66,7 +66,7 @@ a2a_client.py 输出结果示例:
 Process finished with exit code 0
 ```
 
-# 底层metadata元数据的流动过程
+# 对于携带metadata的数据，它的数据流动方式过程是，底层metadata元数据的流动过程。
 1. a2a_client.py ，payload中携带metadata,例如send_message_payload中
 
 2. adk_agent_executor.py中的async def execute的context.message.metadata获取到元数据，async def _process_request的await self._upsert_session在创建新的session时,把元数据放到state中，app_name=self.runner.app_name, user_id="self", session_id=session_id, state={"metadata":metadata}
