@@ -132,13 +132,15 @@ async def DocumentSearch(
     """
     agent_name = tool_context.agent_name
     print(f"Agent{agent_name}正在调用工具：DocumentSearch: " + keyword)
+    metadata = tool_context.state.get("metadata")
+    print(f"调用工具：DocumentSearch时传入的metadata: {metadata}")
     print("文档检索: " + keyword)
     result = ""
     document_ids = []
     for i, doc in enumerate(Documents):
         result += f"# 文档id:{i}\n {doc}\n\n"
         document_ids.append(i)
-    tool_context.state["document_ids"] = document_ids
+    tool_context.state["tool_document_ids"] = document_ids
     return result
 
 if __name__ == '__main__':

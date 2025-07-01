@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 instruction = """
-根据用户的描述生成大纲。仅生成大纲即可，无需多余说明。
+根据用户的描述生成大纲。首先使用DocumentSearch进行一些关键词搜索，然后按下面的格式生成大纲，仅生成大纲即可，无需多余说明。
 输出示例格式如下：
 
 # 第一部分主题
@@ -32,7 +32,17 @@ def before_model_callback(callback_context: CallbackContext, llm_request: LlmReq
     agent_name = callback_context.agent_name
     history_length = len(llm_request.contents)
     metadata = callback_context.state.get("metadata")
-    print(f"调用了{agent_name} research Agent的callback, 现在Agent共有{history_length}条历史记录,metadata数据为：{metadata}")
+    print(f"调用了{agent_name}模型前的callback, 现在Agent共有{history_length}条历史记录,metadata数据为：{metadata}")
+    #清空contents,不需要上一步的拆分topic的记录, 不能在这里清理，否则，每次调用工具都会清除记忆，白操作了
+    # llm_request.contents.clear()
+    # 返回 None，继续调用 LLM
+    return None
+def after_model_callback(callback_context: CallbackContext, llm_response: LlmResponse) -> Optional[LlmResponse]:
+    # 1. 检查用户输入
+    agent_name = callback_context.agent_name
+    response_data = len(llm_response.content.parts)
+    metadata = callback_context.state.get("metadata")
+    print(f"调用了{agent_name}模型后的callback, 这次模型回复{response_data}的信息,metadata数据为：{metadata}")
     #清空contents,不需要上一步的拆分topic的记录, 不能在这里清理，否则，每次调用工具都会清除记忆，白操作了
     # llm_request.contents.clear()
     # 返回 None，继续调用 LLM
@@ -46,5 +56,6 @@ root_agent = Agent(
     ),
     instruction=instruction,
     before_model_callback=before_model_callback,
+    after_model_callback=after_model_callback,
     tools=[DocumentSearch],
 )

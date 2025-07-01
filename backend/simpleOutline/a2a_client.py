@@ -33,5 +33,5 @@ async def httpx_client():
             print(chunk.model_dump(mode='json', exclude_none=True))
 
 if __name__ == '__main__':
-    prompt = """我想调研电动汽车发展"""
+    prompt = """调研电动汽车发展状况"""
     asyncio.run(httpx_client())
