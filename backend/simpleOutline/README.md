@@ -95,3 +95,4 @@ Process finished with exit code 0
 
 # 示例问题：
 我最近感觉有些疲劳。
+是的，有时头晕，体重变轻了
