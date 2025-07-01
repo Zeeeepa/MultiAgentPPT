@@ -85,3 +85,10 @@ Process finished with exit code 0
                 )
                 print("最终的session中的结果final_session中的state: ", final_session.state)
 8. 最终的客户端打印出metadata, {'id': '57071402-98d3-459d-a447-cbdf384e8323', 'jsonrpc': '2.0', 'result': {'artifact': {'artifactId': '156b98ac-3aa6-412c-97e2-6dff3148c46b', 'metadata': {'user_data': 'hello', 'tool_document_ids': [0, 1, 2, 3]}, 'parts': [{'kind': 'text', 'text': '# 电动汽车全球市场概况\n- 全球销量持续增长，新兴市场表现突出\n- 中国引领全球电动汽车市场\n- 欧美市场增长放缓，面临挑战\n\n# 电动汽车技术与成本\n- 电池技术进步与成本下降\n- 充电基础设施的完善与创新\n- 电动卡车经济性改善，长途运输潜力显现\n\n# 电动汽车的消费者接受度\n- 消费者对电动汽车的接受度存在分化\n- 政策与补贴对消费者购买意愿的影响\n- 续航里程和电池衰减是消费者关注的重点'}]}, 'contextId': 'cdbf96d6-8a35-40e2-b3cd-e026c2c446f1', 'kind': 'artifact-update', 'taskId': '3d5160e2-42ef-4244-872f-e23046b685f1'}}
+
+
+# 问诊Agent，提取症状（调用工具，进行匹配）
+1. 用户询问，说出症状
+2. 提取症状，匹配可能的疾病，可能有多个或者唯一。 （当前提取症状和历史的症状都进行累加到匹配条件中）
+3. 如果是唯一，那么查询疾病的治疗建议。
+4. 如果不唯一，那么从几个可能的疾病中询问用户是否还有其它症状。（其它症状来自于其它几个可能的疾病表现）
