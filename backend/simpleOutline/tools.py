@@ -32,9 +32,9 @@ def query_deepseek(prompt):
         return f"Error: {str(e)}"
 
 async def matchDiseaseBySymptoms(
-    symptoms: list,
+    symptoms: list[str],
     tool_context: ToolContext,
-):
+) -> str:
     """
     根据疾病的症状搜索可能的疾病
     params:
@@ -80,7 +80,7 @@ async def matchDiseaseBySymptoms(
     result = query_deepseek(prompt)
     return result
 
-async def getTreatmentAdvice(disease_name: str, tool_context: ToolContext):
+async def getTreatmentAdvice(disease_name: str, tool_context: ToolContext) -> str:
     """
     获取疾病的治疗建议
     params:
