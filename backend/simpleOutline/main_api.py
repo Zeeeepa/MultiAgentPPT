@@ -67,7 +67,7 @@ def main(host, port):
         version="1.0.0",
         defaultInputModes=["text"],
         defaultOutputModes=["text"],
-        capabilities=AgentCapabilities(streaming=True),
+        capabilities=AgentCapabilities(streaming=streaming),
         skills=[skill],
     )
 
