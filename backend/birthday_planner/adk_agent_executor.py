@@ -84,45 +84,6 @@ class ADKAgentExecutor(AgentExecutor):
             run_config=self.run_config,
         )
 
-    async def _handle_auth_required_task(
-        self,
-        tool: BaseTool,
-        args: dict[str, Any],
-        tool_context: ToolContext,
-        tool_response: dict,
-    ) -> dict | None:
-        """Handle requests that return auth-required."""
-        if tool.name != 'message_calendar_agent':
-            return None
-        if not tool_context.state.get('task_suspended'):
-            return None
-        dependent_task = Task.model_validate(
-            tool_context.state['dependent_task']
-        )
-        if dependent_task.status.state != TaskState.auth_required:
-            return None
-        task_updater = self._get_task_updater(tool_context)
-        task_updater.update_status(
-            dependent_task.status.state, message=dependent_task.status.message
-        )
-        # This is not a robust solution. We expect that the calendar agent will only
-        # ever go from auth-required -> completed. A more robust solution would have
-        # more complete state transition handling.
-        task = await self._wait_for_dependent_task(dependent_task)
-        task_updater.update_status(
-            TaskState.working,
-            message=task_updater.new_agent_message(
-                [Part(TextPart(text='Checking calendar agent output'))]
-            ),
-        )
-        tool_context.state['task_suspended'] = False
-        tool_context.state['dependent_task'] = None
-        content = []
-        if task.artifacts:
-            for artifact in task.artifacts:
-                content.extend(get_text_parts(artifact.parts))
-        return {'response': '\n'.join(content)}
-
     def _get_task_updater(self, tool_context: ToolContext):
         return tool_context._invocation_context.run_config.current_task_updater
 
@@ -312,8 +273,8 @@ def convert_a2a_part_to_genai(part: Part) -> types.Part:
                     data=part.file.bytes, mime_type=part.file.mime_type
                 )
             )
-        raise ValueError(f'Unsupported file type: {type(part.file)}')
-    raise ValueError(f'Unsupported part type: {type(part)}')
+        raise ValueError(f"Unsupported file type: {type(part.file)}")
+    raise ValueError(f"Unsupported part type: {type(part)}")
 
 
 def convert_genai_parts_to_a2a(parts: list[types.Part]) -> list[Part]:
@@ -345,4 +306,4 @@ def convert_genai_part_to_a2a(part: types.Part) -> Part:
                 )
             )
         )
-    raise ValueError(f'Unsupported part type: {part}')
+    raise ValueError(f"Unsupported part type: {part}")

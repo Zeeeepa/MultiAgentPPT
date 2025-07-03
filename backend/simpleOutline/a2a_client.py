@@ -10,7 +10,7 @@ async def httpx_client():
     async with httpx.AsyncClient(timeout=timeout) as httpx_client:
         # 初始化客户端（确保base_url包含协议头）
         client = await A2AClient.get_client_from_agent_card_url(
-            httpx_client, 'http://localhost:10008'  # 确保此处是完整 URL
+            httpx_client, 'http://localhost:10001'  # 确保此处是完整 URL
         )
 
         # 生成唯一请求ID

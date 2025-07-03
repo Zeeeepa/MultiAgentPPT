@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from collections.abc import AsyncGenerator
+from collections.abc import AsyncGenerator,AsyncIterable
 from google.adk import Runner
 
 from google.adk.events import Event
@@ -13,11 +13,22 @@ from a2a.server.events.event_queue import EventQueue
 from a2a.server.tasks import TaskUpdater
 from a2a.types import (
     AgentCard,
+    Artifact,
     FilePart,
     FileWithBytes,
     FileWithUri,
+    GetTaskRequest,
+    GetTaskSuccessResponse,
+    Message,
+    MessageSendParams,
     Part,
+    Role,
+    SendMessageRequest,
+    SendMessageSuccessResponse,
+    Task,
+    TaskQueryParams,
     TaskState,
+    TaskStatus,
     TextPart,
     UnsupportedOperationError,
 )
@@ -52,7 +63,7 @@ class ADKAgentExecutor(AgentExecutor):
         new_message: types.Content,
         session_id: str,
         task_updater: TaskUpdater,
-    ) -> None:
+    ) -> AsyncIterable[TaskStatus | Artifact]:
         # The call to self._upsert_session was returning a coroutine object,
         # leading to an AttributeError when trying to access .id on it directly.
         # We need to await the coroutine to get the actual session object.
@@ -69,12 +80,12 @@ class ADKAgentExecutor(AgentExecutor):
             if event.is_final_response():
                 parts = convert_genai_parts_to_a2a(event.content.parts)
                 logger.debug("Yielding final response: %s", parts)
-                task_updater.add_artifact(parts)
-                task_updater.complete()
+                await task_updater.add_artifact(parts)
+                await task_updater.complete()
                 break
             if not event.get_function_calls():
                 logger.debug(f"Yielding update response, {event}")
-                task_updater.update_status(
+                await task_updater.update_status(
                     TaskState.working,
                     message=task_updater.new_agent_message(
                         convert_genai_parts_to_a2a(event.content.parts),
@@ -92,8 +103,8 @@ class ADKAgentExecutor(AgentExecutor):
         updater = TaskUpdater(event_queue, context.task_id, context.context_id)
         # Immediately notify that the task is submitted.
         if not context.current_task:
-            updater.submit()
-        updater.start_work()
+            await updater.submit()
+        await updater.start_work()
         await self._process_request(
             types.UserContent(
                 parts=convert_a2a_parts_to_genai(context.message.parts),
