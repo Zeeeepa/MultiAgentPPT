@@ -16,6 +16,7 @@ def create_model(model:str, provider: str):
     LiteLlm(model="deepseek/deepseek-chat", api_key="xxx", api_base="")
     :return:
     """
+    print(f"创建模型,provider: {provider},模型是: {model}")
     if provider == "google":
         # google的模型直接使用名称
         assert os.environ.get("GOOGLE_API_KEY"), "GOOGLE_API_KEY is not set"
