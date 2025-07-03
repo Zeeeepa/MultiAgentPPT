@@ -15,12 +15,8 @@ from google.adk.agents.run_config import RunConfig, StreamingMode
 from a2a.server.apps import A2AStarletteApplication
 from a2a.server.request_handlers import DefaultRequestHandler
 from a2a.server.tasks import InMemoryTaskStore
+from a2a.types import AgentCapabilities, AgentCard, AgentSkill
 from starlette.middleware.cors import CORSMiddleware
-from a2a.types import (
-    AgentCapabilities,
-    AgentCard,
-    AgentSkill,
-)
 from starlette.applications import Starlette
 from agent import root_agent
 
@@ -37,7 +33,7 @@ logger = logging.getLogger(__name__)
 @click.command()
 @click.option("--host", "host", default="localhost", help="服务器绑定的主机名（默认为 localhost,可以指定具体本机ip）")
 @click.option("--port", "port", default=10001, help="服务器监听的端口号（默认为 10001）")
-def main(host, port):
+def main(host: str, port: int):
     """
     启动 Outline Agent 服务，支持流式和非流式两种模式。
     """

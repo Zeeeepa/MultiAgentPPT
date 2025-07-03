@@ -13,6 +13,7 @@ from a2a.server.agent_execution import AgentExecutor, RequestContext
 from a2a.server.events.event_queue import EventQueue
 from a2a.server.tasks import TaskUpdater
 from a2a.types import (
+    AgentCard,
     Artifact,
     FilePart,
     FileWithBytes,
@@ -63,36 +64,11 @@ class A2ARunConfig(RunConfig):
 class ADKAgentExecutor(AgentExecutor):
     """An AgentExecutor that runs an ADK-based Agent."""
 
-    def __init__(self, calendar_agent_url, run_config):
-        self._agent = LlmAgent(
-            model='gemini-2.0-flash-001',
-            name='birthday_planner_agent',
-            description='An agent that helps manage birthday parties.',
-            after_tool_callback=self._handle_auth_required_task,
-            instruction="""
-    You are an agent that helps plan birthday parties.
+    def __init__(self, runner: Runner, card: AgentCard, run_config):
+        self.runner = runner
+        self._card = card
 
-    Your job as a party planner is to act as a sounding board and idea generator for
-    users who are planning a birthday party.
-
-    You should provide suggestions on, or encourage the user to provide details on:
-    - Venues
-    - Time of day, day of week to hold the party
-    - Age-appropriate activities
-    - Themes for the party
-
-    You can delegate tasks to a separate Calendar Agent that can help manage the user's calendar.
-    """,
-            tools=[self.message_calendar_agent],
-        )
-        self.calendar_agent_endpoint = calendar_agent_url
-        self.runner = Runner(
-            app_name=self._agent.name,
-            agent=self._agent,
-            artifact_service=InMemoryArtifactService(),
-            session_service=InMemorySessionService(),
-            memory_service=InMemoryMemoryService(),
-        )
+        self._running_sessions = {}
         self.run_config = run_config
 
     def _run_agent(

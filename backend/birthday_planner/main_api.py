@@ -6,6 +6,14 @@ import os
 import click
 import uvicorn
 
+from adk_agent_executor import ADKAgentExecutor
+from dotenv import load_dotenv
+from google.adk.artifacts import InMemoryArtifactService
+from google.adk.memory.in_memory_memory_service import InMemoryMemoryService
+from google.adk.runners import Runner
+from google.adk.sessions import InMemorySessionService
+from starlette.routing import Route
+from google.adk.agents.run_config import RunConfig, StreamingMode
 from a2a.server.apps import A2AStarletteApplication
 from a2a.server.request_handlers import DefaultRequestHandler
 from a2a.server.tasks import InMemoryTaskStore
@@ -14,8 +22,9 @@ from starlette.middleware.cors import CORSMiddleware
 from google.adk.agents.run_config import RunConfig, StreamingMode
 from adk_agent_executor import ADKAgentExecutor  # type: ignore[import-untyped]
 from dotenv import load_dotenv
+from agent import root_agent
 
-
+# 加载环境变量
 load_dotenv()
 
 # 配置日志格式和级别
@@ -35,16 +44,22 @@ def make_sync(func):
 
 
 @click.command()
-@click.option('--host', 'host', default='localhost')
-@click.option('--port', 'port', default=10008)
-@click.option(
-    '--calendar-agent', 'calendar_agent', default='http://localhost:10007'
-)
-def main(host: str, port: int, calendar_agent: str):
+@click.option("--host", "host", default="localhost", help="服务器绑定的主机名（默认为 localhost,可以指定具体本机ip）")
+@click.option("--port", "port", default=10008, help="服务器监听的端口号（默认为 10008）")
+def main(host: str, port: int):
+    logger.info("启动plan_parties 服务")
+    streaming = os.environ.get("STREAMING") == "true"
+    logger.info(f"流式模式: {streaming}")
+
+    agent_card_name = "Party Agent"
+    agent_name = "plan_parties"
+    # Agent描述必须清晰
+    agent_description = "Plan a birthday party, including times, activities, and themes"
+
     skill = AgentSkill(
-        id='plan_parties',
-        name='Plan a Birthday Party',
-        description='Plan a birthday party, including times, activities, and themes.',
+        id=agent_name,
+        name=agent_card_name,
+        description=agent_description,
         tags=['event-planning'],
         examples=[
             'My son is turning 3 on August 2nd! What should I do for his party?',
@@ -52,8 +67,28 @@ def main(host: str, port: int, calendar_agent: str):
         ],
     )
 
+    # 构建 agent 卡片信息
+    agent_card = AgentCard(
+        name=agent_card_name,
+        description=agent_description,
+        url=f"http://{host}:{port}/",
+        version="1.0.0",
+        defaultInputModes=["text"],
+        defaultOutputModes=["text"],
+        capabilities=AgentCapabilities(streaming=streaming),
+        skills=[skill],
+    )
+
+    # 初始化 Runner，管理 agent 的执行、会话、记忆和产物
+    runner = Runner(
+        app_name=agent_card.name,
+        agent=root_agent,
+        artifact_service=InMemoryArtifactService(),
+        session_service=InMemorySessionService(),
+        memory_service=InMemoryMemoryService(),
+    )
+
     # 根据环境变量决定是否启用流式输出
-    streaming = True
     if streaming:
         logger.info("使用 SSE 流式输出模式")
         run_config = RunConfig(
@@ -68,17 +103,9 @@ def main(host: str, port: int, calendar_agent: str):
         )
 
     # 初始化 agent 执行器
-    agent_executor = ADKAgentExecutor(calendar_agent,run_config)
-    agent_card = AgentCard(
-        name='Birthday Planner',
-        description='I can help you plan fun birthday parties.',
-        url=f'http://{host}:{port}/',
-        version='1.0.0',
-        defaultInputModes=['text'],
-        defaultOutputModes=['text'],
-        capabilities=AgentCapabilities(streaming=streaming),
-        skills=[skill],
-    )
+    agent_executor = ADKAgentExecutor(runner, agent_card, run_config)
+
+    # 请求处理器，管理任务存储和请求分发
     request_handler = DefaultRequestHandler(
         agent_executor=agent_executor, task_store=InMemoryTaskStore()
     )
