@@ -10,6 +10,7 @@ from a2a.server.apps import A2AStarletteApplication
 from a2a.server.request_handlers import DefaultRequestHandler
 from a2a.server.tasks import InMemoryTaskStore
 from a2a.types import AgentCapabilities, AgentCard, AgentSkill
+from starlette.middleware.cors import CORSMiddleware
 from google.adk.agents.run_config import RunConfig, StreamingMode
 from adk_agent_executor import ADKAgentExecutor  # type: ignore[import-untyped]
 from dotenv import load_dotenv
@@ -17,7 +18,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-logging.basicConfig()
+# 配置日志格式和级别
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
+logger = logging.getLogger(__name__)
 
 
 def make_sync(func):
@@ -49,13 +55,13 @@ def main(host: str, port: int, calendar_agent: str):
     # 根据环境变量决定是否启用流式输出
     streaming = True
     if streaming:
-        print("使用 SSE 流式输出模式")
+        logger.info("使用 SSE 流式输出模式")
         run_config = RunConfig(
             streaming_mode=StreamingMode.SSE,
             max_llm_calls=500
         )
     else:
-        print("使用普通输出模式")
+        logger.info("使用普通输出模式")
         run_config = RunConfig(
             streaming_mode=StreamingMode.NONE,
             max_llm_calls=500
@@ -76,9 +82,22 @@ def main(host: str, port: int, calendar_agent: str):
     request_handler = DefaultRequestHandler(
         agent_executor=agent_executor, task_store=InMemoryTaskStore()
     )
-    app = A2AStarletteApplication(agent_card, request_handler)
-    uvicorn.run(app.build(), host=host, port=port)
 
+    # 构建 Starlette 应用
+    a2a_app = A2AStarletteApplication(
+        agent_card=agent_card, http_handler=request_handler
+    )
+    app = a2a_app.build()
+    # CORS
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    logger.info(f"服务启动中，监听地址: http://{host}:{port}")
+    # 启动 uvicorn 服务器
+    uvicorn.run(app, host=host, port=port)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
