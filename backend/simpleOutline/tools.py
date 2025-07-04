@@ -132,7 +132,9 @@ async def DocumentSearch(
     """
     agent_name = tool_context.agent_name
     print(f"Agent{agent_name}正在调用工具：DocumentSearch: " + keyword)
-    metadata = tool_context.state.get("metadata")
+    metadata = tool_context.state.get("metadata", {})
+    if metadata is None:
+        metadata = {}
     print(f"调用工具：DocumentSearch时传入的metadata: {metadata}")
     print("文档检索: " + keyword)
     result = ""
