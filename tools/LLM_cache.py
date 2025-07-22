@@ -3,7 +3,8 @@
 # @Date  : 2025/6/22
 # @File  : LLM_cache.py
 # @Author: johnson
-# @Desc  : 大语言模型代理，缓存到本地文件
+# @Desc  : 大语言模型代理，缓存到本地文件,
+# 1. 大模型回退策略，当尝试max_retries，当大于3次时，自动使用fallback_model的模型
 """
 同样可以在.env中配置:HTTP_PROXY
 HTTP_PROXY=http://127.0.0.1:7890
@@ -152,18 +153,19 @@ async def proxy_request(request: Request):
 
     assert provider_url, "请检查模型名称是否正确,提供的模型是否有对应的链接？"
 
-    async def event_stream():
+    async def event_stream(has_switched: bool = False):
         lines = []
-        max_retries = 3
+        max_retries = 5
         retry_delay = 1
+        fallback_model = "qwen-turbo-latest"
+
+        nonlocal provider_url, body  # 允许修改外层变量
 
         for attempt in range(max_retries):
             try:
-                logger.log(f"尝试连接LLM服务器 (第 {attempt + 1} 次)")
+                logger.log(f"尝试连接LLM服务器 (第 {attempt + 1} 次)，当前模型: {body['model']}")
 
-                # 增加超时时间和重试机制
                 timeout = httpx.Timeout(600.0, connect=20.0)
-
                 async with httpx.AsyncClient(
                         timeout=timeout,
                         verify=False,
@@ -177,9 +179,10 @@ async def proxy_request(request: Request):
                         "Connection": "keep-alive"
                     }
 
-                    # 添加认证头
                     if request.headers.get("Authorization"):
                         headers["Authorization"] = request.headers.get("Authorization")
+                    if has_switched and fallback_model == "qwen-turbo-latest":
+                        headers["Authorization"] = os.environ["ALI_API_KEY"]
 
                     async with client.stream(
                             "POST",
@@ -189,7 +192,6 @@ async def proxy_request(request: Request):
                     ) as response:
                         logger.log(f"收到响应状态码: {response.status_code}")
 
-                        # 检查响应状态
                         if response.status_code != 200:
                             error_text = await response.aread()
                             logger.log(f"请求失败，状态码: {response.status_code}, 错误: {error_text}")
@@ -199,75 +201,54 @@ async def proxy_request(request: Request):
                                 retry_delay *= 2
                                 continue
                             else:
-                                yield f"data: {{'error': '请求失败，状态码: {response.status_code}'}}\n\n"
-                                return
+                                logger.log(f"超过最大重试次数，将尝试切换备用模型: {fallback_model}")
+                                break
 
-                        # 处理流式响应
                         async for line in response.aiter_lines():
-                            if line.strip():  # 忽略空行
+                            if line.strip():
                                 logger.log(f"收到数据: {line}")
                                 lines.append(line + "\n")
                                 yield line + "\n"
-
-                        # 如果成功完成，跳出重试循环
                         break
 
-            except httpx.RemoteProtocolError as e:
-                logger.log(f"服务器连接错误 (第 {attempt + 1} 次): {e}")
-                if attempt < max_retries - 1:
-                    logger.log(f"等待 {retry_delay} 秒后重试...")
-                    await asyncio.sleep(retry_delay)
-                    retry_delay *= 2
-                    continue
-                else:
-                    error_msg = f"data: 'error': '服务器连接失败，已重试 {max_retries} 次'\n\n"
-                    yield error_msg
-                    return
-
-            except httpx.TimeoutException as e:
-                logger.log(f"请求超时 (第 {attempt + 1} 次): {e}")
-                if attempt < max_retries - 1:
-                    logger.log(f"等待 {retry_delay} 秒后重试...")
-                    await asyncio.sleep(retry_delay)
-                    retry_delay *= 2
-                    continue
-                else:
-                    error_msg = f"data: 'error': '请求超时，已重试 {max_retries} 次'\n\n"
-                    yield error_msg
-                    return
-
             except Exception as e:
-                logger.log(f"未知错误 (第 {attempt + 1} 次): {e}")
+                logger.log(f"请求异常 (第 {attempt + 1} 次): {e}")
                 if attempt < max_retries - 1:
                     logger.log(f"等待 {retry_delay} 秒后重试...")
                     await asyncio.sleep(retry_delay)
                     retry_delay *= 2
-                    continue
                 else:
-                    error_msg = f"data: 'error': '未知错误: {str(e)}'\n\n"
-                    yield error_msg
-                    return
+                    logger.log(f"超过最大重试次数，将尝试切换备用模型: {fallback_model}")
+                    break
 
-        # 写入本地缓存文件
-        if lines:
-            # 检查是否包含错误信息
-            content_str = "".join(lines)
-            if any(error_keyword in content_str.lower() for error_keyword in
-                   ["incorrect api key", "requesttimeout", "error_msg", "error"]):
-                logger.log(f"ERROR: 请求失败，不写入缓存。请求信息长度: {len(body_str)}")
-                logger.log(f"错误响应: {content_str[:500]}...")
+        # 如果所有尝试都失败，并且尚未切换过备用模型
+        if not lines and not has_switched:
+            try:
+                body["model"] = fallback_model
+                provider_url = get_provider_url_by_model(fallback_model)
+                logger.log(f"切换到备用模型: {fallback_model}，URL: {provider_url}")
+                async for chunk in event_stream(has_switched=True):  # 传入状态，防止无限递归
+                    yield chunk
+                return
+            except Exception as e:
+                error_msg = f"data: 'error': '备用模型请求失败: {str(e)}'\n\n"
+                yield error_msg
                 return
 
-            # 写入缓存
+        if lines:
+            content_str = "".join(lines)
+            if any(err in content_str.lower() for err in ["incorrect api key", "timeout", "error"]):
+                logger.log(f"⚠️ 缓存中含有错误关键词，跳过写入")
+                return
             try:
                 with open(cache_path, 'w', encoding='utf-8') as f:
                     f.writelines(lines)
-                logger.log(f"已写入本地缓存：{cache_path}")
+                logger.log(f"✅ 缓存写入成功：{cache_path}")
             except Exception as e:
-                logger.log(f"写入缓存失败: {e}")
+                logger.log(f"缓存写入失败: {e}")
+
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")
-
 
 @app.api_route("/{path_name:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
 async def unsupported_path(request: Request, path_name: str):
