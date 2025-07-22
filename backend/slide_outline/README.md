@@ -83,3 +83,5 @@
 - 电池回收与环保问题
 - 智能化与自动驾驶发展机遇
 ````
+# MCP测试程序
+[mcp_test_client.py](mcp_test_client.py)
