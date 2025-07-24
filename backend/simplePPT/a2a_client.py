@@ -20,7 +20,8 @@ async def httpx_client():
             'message': {
                 'role': 'user',
                 'parts': [{'type': 'text', 'text': prompt}],
-                'messageId': request_id
+                'messageId': request_id,
+                'metadata': {"numSlides": 10, "language": "中文"}
             }
         }
         print(f"发送message信息: {send_message_payload}")

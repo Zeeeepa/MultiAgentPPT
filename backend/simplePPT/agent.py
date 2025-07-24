@@ -2,6 +2,7 @@ import random
 import os
 from google.adk.agents import Agent
 from create_model import create_model
+from google.adk.agents.callback_context import CallbackContext
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -15,6 +16,8 @@ instruction = """
 2. **内容要求**：**不要直接照搬大纲内容**，而是要加以扩展，加入示例、数据和背景信息。
 3. **多样性要求**：每一页幻灯片尽量使用**不同的布局组件**。
 4. **视觉要求**：每一页幻灯片必须包含至少一张图片。
+5. **ppt的页数**: {slides_plan_num}
+6. **语言要求**: {language}
 
 ---
 
@@ -204,11 +207,27 @@ https://c-ssl.duitang.com/uploads/item/201909/24/20190924003225_luvye.png
 
 model = create_model(model=os.environ["LLM_MODEL"], provider=os.environ["MODEL_PROVIDER"])
 
+
+def before_agent_callback(callback_context: CallbackContext) -> None:
+    """
+    在调用LLM之前，从会话状态中获取当前幻灯片计划，并格式化LLM输入。
+    """
+    metadata = callback_context.state.get("metadata", {})
+    print(f"传入的metadata信息如下: {metadata}")
+    slides_plan_num = metadata.get("numSlides",10)
+    language = metadata.get("language","EN-US")
+    # 设置幻灯片数量和语言
+    callback_context.state["slides_plan_num"] = slides_plan_num
+    callback_context.state["language"] = language
+    # 返回 None，继续调用 LLM
+    return None
+
 root_agent = Agent(
     name="ppt_agent",
     model=model,
     description=(
         "generate ppt content"
     ),
-    instruction=instruction+SOME_EXAMPLE_IAMGES
+    instruction=instruction+SOME_EXAMPLE_IAMGES,
+    before_agent_callback = before_agent_callback
 )
