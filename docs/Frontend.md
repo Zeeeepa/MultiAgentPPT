@@ -102,3 +102,14 @@ POST请求，body为{ items }。
 成功后自动触发浏览器下载。
 3. 在Header中集成
 功能：在PresentationHeader.tsx右侧按钮区，ShareButton旁边插入DownloadPPT按钮，仅在isPresentationPage且未在放映状态下显示。
+
+# 去除裁剪，否则显示不全
+src/components/presentation/dashboard/PresentationDashboard.tsx
+
+去除裁剪
+        presentationInput.substring(0, 50) || "Untitled Presentation"
+
+
+      const result = await createEmptyPresentation(
+        presentationInput || "Untitled Presentation"
+      );

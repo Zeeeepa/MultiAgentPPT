@@ -42,7 +42,7 @@ export function PresentationDashboard() {
     setIsGeneratingOutline(true);
     try {
       const result = await createEmptyPresentation(
-        presentationInput.substring(0, 50) || "Untitled Presentation"
+        presentationInput || "Untitled Presentation"
       );
       console.timeEnd("createEmptyPresentation");
       if (result.success && result.presentation) {
