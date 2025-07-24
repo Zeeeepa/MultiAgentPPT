@@ -67,6 +67,9 @@ class ADKAgentExecutor(AgentExecutor):
         # leading to an AttributeError when trying to access .id on it directly.
         # We need to await the coroutine to get the actual session object.
         # metadata用户传入的原数据
+        if metadata is None:
+            # 没有传入元数据，创建一个空字典
+            metadata = {}
         session_obj = await self._upsert_session(
             session_id,metadata
         )
@@ -88,16 +91,30 @@ class ADKAgentExecutor(AgentExecutor):
                 await task_updater.add_artifact(parts, metadata=final_metadata)
                 await task_updater.complete()
                 break
-            if not event.get_function_calls():
-                logger.debug(f"Yielding update response, {event}")
+            elif event.get_function_calls():
+                logger.info(f"触发了工具调用。。。返回DataPart数据, {event}")
                 await task_updater.update_status(
                     TaskState.working,
                     message=task_updater.new_agent_message(
-                        convert_genai_parts_to_a2a(event.content.parts),
+                        convert_genai_parts_to_a2a(event.content.parts)
+                    ),
+                )
+            elif event.get_function_responses():
+                logger.info(f"工具返回了结果。。。返回DataPart数据, {event}")
+                await task_updater.update_status(
+                    TaskState.working,
+                    message=task_updater.new_agent_message(
+                        convert_genai_parts_to_a2a(event.content.parts)
                     ),
                 )
             else:
-                logger.info(f"Skipping event, {event}")
+                logger.info(f"其它的事件,例如数据的流事件 {event}")
+                await task_updater.update_status(
+                    TaskState.working,
+                    message=task_updater.new_agent_message(
+                        convert_genai_parts_to_a2a(event.content.parts)
+                    ),
+                )
 
     async def execute(
         self,
@@ -177,7 +194,7 @@ def convert_genai_parts_to_a2a(parts: list[types.Part]) -> list[Part]:
     return [
         convert_genai_part_to_a2a(part)
         for part in parts
-        if (part.text or part.file_data or part.inline_data)
+        if (part.text or part.file_data or part.inline_data or part.function_call or part.function_response)
     ]
 
 
@@ -201,4 +218,43 @@ def convert_genai_part_to_a2a(part: types.Part) -> Part:
                 )
             )
         )
+    if part.function_call:
+        # print(f"function_call , {part}")
+        function_data = extract_function_info_to_datapart(part)
+        return DataPart(data=function_data)
+    if part.function_response:
+        # print(f"function_response, {part}")
+        function_data = extract_function_info_to_datapart(part)
+        return DataPart(data=function_data)
     raise ValueError(f"Unsupported part type: {part}")
+
+
+def extract_function_info_to_datapart(part: Part) -> DataPart:
+    """
+    从一系列Part对象中提取function_call或function_response信息，
+    并将其封装为DataPart对象。
+
+    Args:
+        part: 包含Part对象
+    Returns:
+        DataPart对象。
+    """
+    extracted_data = {}
+
+    if part.function_call:
+        # 提取 function_call 信息
+        extracted_data = {
+            "type": "function_call",
+            "id": part.function_call.id,
+            "name": part.function_call.name,
+            "args": part.function_call.args
+        }
+    elif part.function_response:
+        # 提取 function_response 信息
+        extracted_data = {
+            "type": "function_response",
+            "id": part.function_response.id,
+            "name": part.function_response.name,
+            "response": part.function_response.response
+        }
+    return extracted_data
