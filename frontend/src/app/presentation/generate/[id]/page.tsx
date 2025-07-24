@@ -201,7 +201,7 @@ export default function PresentationGenerateWithIdPage() {
           disabled={isGeneratingPresentation}
         >
           <Wand2 className="h-5 w-5" />
-          {isGeneratingPresentation ? "Generating..." : "生成演示文稿"}
+          {isGeneratingPresentation ? "Generating..." : "Generate Presentation"}
         </Button>
       </div>
     </ThemeBackground>

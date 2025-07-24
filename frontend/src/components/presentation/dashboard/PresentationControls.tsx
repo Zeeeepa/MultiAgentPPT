@@ -28,7 +28,7 @@ export function PresentationControls({
       <div>
         {shouldShowLabel && (
           <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Slide 数量
+            Number of slides
           </label>
         )}
         <Select
@@ -52,7 +52,7 @@ export function PresentationControls({
       <div>
         {shouldShowLabel && (
           <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-            语言
+            Language
           </label>
         )}
         <Select value={language} onValueChange={setLanguage}>
@@ -80,7 +80,7 @@ export function PresentationControls({
       <div>
         {shouldShowLabel && (
           <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-            风格
+            Page style
           </label>
         )}
         <Select value={pageStyle} onValueChange={setPageStyle}>

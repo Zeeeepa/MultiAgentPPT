@@ -302,7 +302,7 @@ export function RecentPresentations() {
         <div className="flex items-center gap-2">
           <Clock className="h-5 w-5 text-primary" />
           <h2 className="text-xl font-semibold text-foreground">
-            最近演示文稿
+            Recent Presentations
           </h2>
         </div>
         <Button

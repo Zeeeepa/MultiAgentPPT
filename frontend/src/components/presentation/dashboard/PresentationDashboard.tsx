@@ -101,7 +101,7 @@ export function PresentationDashboard() {
                 className="gap-2"
               >
                 <Wand2 className="h-4 w-4" />
-                生成演示文稿
+                Generate Presentation
               </Button>
               <Button
                 variant="outline"

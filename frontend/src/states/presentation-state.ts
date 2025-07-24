@@ -93,7 +93,7 @@ export const usePresentationState = create<PresentationState>((set) => ({
   shouldShowExitHeader: false,
   setShouldShowExitHeader: (update) => set({ shouldShowExitHeader: update }),
   numSlides: 10,
-  language: "zh",
+  language: "en-US",
   pageStyle: "default",
   showTemplates: false,
   presentationInput: "",
