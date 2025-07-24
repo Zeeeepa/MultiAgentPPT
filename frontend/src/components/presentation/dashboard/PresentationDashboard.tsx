@@ -34,21 +34,18 @@ export function PresentationDashboard() {
   }, []);
 
   const handleGenerate = async () => {
+    console.time("createEmptyPresentation");
     if (!presentationInput.trim()) {
       toast.error("Please enter a topic for your presentation");
       return;
     }
-
-    // Set UI loading state
     setIsGeneratingOutline(true);
-
     try {
       const result = await createEmptyPresentation(
         presentationInput.substring(0, 50) || "Untitled Presentation"
       );
-
+      console.timeEnd("createEmptyPresentation");
       if (result.success && result.presentation) {
-        // Set the current presentation
         setCurrentPresentation(
           result.presentation.id,
           result.presentation.title
@@ -104,7 +101,7 @@ export function PresentationDashboard() {
                 className="gap-2"
               >
                 <Wand2 className="h-4 w-4" />
-                Generate Presentation
+                生成演示文稿
               </Button>
               <Button
                 variant="outline"

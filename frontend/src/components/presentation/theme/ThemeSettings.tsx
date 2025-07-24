@@ -124,7 +124,7 @@ export function ThemeSettings() {
         </div>
       </div>
 
-      <div className="space-y-4">
+      {/* <div className="space-y-4">
         <Label className="text-sm font-medium">Image Generation Model</Label>
         <Select
           value={imageModel || "black-forest-labs/FLUX.1-schnell-Free"}
@@ -141,7 +141,7 @@ export function ThemeSettings() {
             ))}
           </SelectContent>
         </Select>
-      </div>
+      </div> */}
 
       <div className="space-y-4">
         <Label className="text-sm font-medium">Presentation Style</Label>

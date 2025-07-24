@@ -2,12 +2,14 @@
 import { NextResponse } from "next/server";
 import { A2AClient, Message } from "@a2a-js/sdk";
 import crypto from "node:crypto";
+import { languages } from "prismjs";
 
 interface SlidesRequest {
   title: string;
   outline: string[];
   language: string;
   tone: string;
+  numSlides: number;
 }
 
 function generateId() {
@@ -36,6 +38,7 @@ ${slidesRequest.outline.map((item, index) => `${index + 1}. ${item}`).join("\n")
     kind: "message",
     role: "user",
     parts: [{ kind: "text", text: content }],
+    metadata: {language: slidesRequest.language, tone: slidesRequest.tone, numSlides: slidesRequest.numSlides}
   };
 
   try {
@@ -72,7 +75,7 @@ ${slidesRequest.outline.map((item, index) => `${index + 1}. ${item}`).join("\n")
 
 export async function POST(req: Request) {
   try {
-    const { title, outline, language, tone } = (await req.json()) as SlidesRequest;
+    const { title, outline, language, tone, numSlides } = (await req.json()) as SlidesRequest;
 
     if (!title || !outline || !Array.isArray(outline) || !language) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -85,6 +88,7 @@ export async function POST(req: Request) {
           outline,
           language,
           tone,
+          numSlides
         });
 
         for await (const chunk of generator) {

@@ -197,7 +197,7 @@ export function PresentationGenerationManager() {
       const response = await fetch("/api/presentation/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, outline, language, tone }),
+        body: JSON.stringify({ title, outline, language, tone, numSlides}),
       });
       if (!response.body) throw new Error("No response body");
   
