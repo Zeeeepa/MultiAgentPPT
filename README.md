@@ -25,10 +25,12 @@ MultiAgentPPT 利用多智能体架构实现从主题输入到完整演示文稿
 - ✅ 引入 PPTChecker Agent 检查每一页生成的 PPT 质量。实际测试效果良好，请自行替换为真实图片数据和内容 RAG 数据。
 - ✅ 前端显示每个 Agent 的生成过程状态。
 - ✅ pptx下载，使用python-pptx下载前端json数据，后端渲染。
+- ✅ metadata 数据传输：支持前端向 Agent 传输配置，Agent 返回结果时附带 metadata 信息。
+- ✅ [本地模型适配.md](docs/%E6%9C%AC%E5%9C%B0%E6%A8%A1%E5%9E%8B%E9%80%82%E9%85%8D.md)
+
 
 ### 📝 待完成（Todo）
-- 🔄 多模态理解图片：包括图片方向、大小等格式处理，用于适配 PPT 不同位置。
-- 🔄 metadata 数据传输：支持前端向 Agent 传输配置，Agent 返回结果时附带 metadata 信息。
+- 🔄 整合编辑可见可下载的pptx前端
 
 ## 三、使用界面截图展示
 
