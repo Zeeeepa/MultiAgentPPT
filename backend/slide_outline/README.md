@@ -23,7 +23,9 @@
 
    ```bash
    python main_api.py
+   可以指定不同的模型，具体查看main_api.py代码，例如python main_api.py --provider deepseek --model deepseek-chat
    ```
+   
 
 ---
 
