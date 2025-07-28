@@ -5,4 +5,4 @@ CLAUDE_API_KEY=xx
 # 阿里云api
 ALI_API_KEY=xx
 #流式的响应，测试gemini的效果很好，true表示开启流的请求和响应
-STREAMING=true
+STREAMING=false
