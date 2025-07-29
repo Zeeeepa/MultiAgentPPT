@@ -34,6 +34,7 @@
 
 ## 运行方法
 ```
+在.env文件中先修改模型和模型使用的key
 python main_api.py
 ```
 
