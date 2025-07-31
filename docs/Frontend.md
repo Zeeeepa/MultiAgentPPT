@@ -113,3 +113,42 @@ src/components/presentation/dashboard/PresentationDashboard.tsx
       const result = await createEmptyPresentation(
         presentationInput || "Untitled Presentation"
       );
+
+#ARROWS格式的页面乱码修复
+src/components/presentation/editor/custom-elements/visualization-list-plugin.tsx
+使用了组件arrow-item.tsx
+src/components/presentation/editor/custom-elements/arrow-item.tsx
+
+父组件(visualization-list-plugin.tsx)
+const ArrowVisualization = ({
+  items,
+  children,
+}: {
+  items: TDescendant[];
+  children: React.ReactNode;
+}) => {
+  const childrenArray = React.Children.toArray(children);
+
+  return (
+    <div className="my-4 mb-8 flex w-full flex-col overflow-visible">
+      {childrenArray.map((child, index) => (
+        <ArrowItem key={index} index={index} element={items[index] as TElement}>
+          {child}
+        </ArrowItem>
+      ))}
+    </div>
+  );
+};
+
+
+去掉了h-24，改成了min-h-24
+  return (
+    <div className="my-4 mb-8 flex w-full flex-col min-h-24 overflow-visible">
+      {childrenArray.map((child, index) => (
+        <ArrowItem key={index} index={index} element={items[index] as TElement}>
+          {child}
+        </ArrowItem>
+      ))}
+    </div>
+  );
+
