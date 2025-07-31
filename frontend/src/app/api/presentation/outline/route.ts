@@ -39,7 +39,7 @@ function iteratorToStream(iterator: AsyncGenerator<string>): ReadableStream<stri
   });
 }
 
-async function* generateOutlineStream(serverUrl: string, content: string) {
+async function* generateOutlineStream(serverUrl: string, content: string, language: string) {
   const client = new A2AClient(serverUrl);
 
   const messageId = generateId();
@@ -48,6 +48,7 @@ async function* generateOutlineStream(serverUrl: string, content: string) {
     kind: "message",
     role: "user",
     parts: [{ kind: "text", text: content }],
+    metadata: { language: language}, // You can adjust the number of slides as needed
     // For a new outline, we typically start a new task/context.
     // If you need to continue a conversation, you'd pass taskId/contextId here.
   };
@@ -99,7 +100,7 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
-    const stream = iteratorToStream(generateOutlineStream(A2A_AGENT_SERVER_URL, prompt));
+    const stream = iteratorToStream(generateOutlineStream(A2A_AGENT_SERVER_URL, prompt, language));
     return LangChainAdapter.toDataStreamResponse(stream);
   } catch (error) {
     console.error("Error in presentation outline:", error);

@@ -55,7 +55,7 @@ export const ArrowItem = ({
     <div
       ref={previewRef}
       className={cn(
-        "group/arrow-item relative mb-2 ml-4 flex h-24 gap-2",
+        "group/arrow-item relative mb-2 ml-4 flex min-h-24 gap-2",
         isDragging && "opacity-50",
         dropLine && "drop-target",
       )}

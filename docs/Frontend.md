@@ -142,13 +142,10 @@ const ArrowVisualization = ({
 
 
 去掉了h-24，改成了min-h-24
-  return (
-    <div className="my-4 mb-8 flex w-full flex-col min-h-24 overflow-visible">
-      {childrenArray.map((child, index) => (
-        <ArrowItem key={index} index={index} element={items[index] as TElement}>
-          {child}
-        </ArrowItem>
-      ))}
-    </div>
-  );
-
+      ref={previewRef}
+      className={cn(
+        "group/arrow-item relative mb-2 min-h-24 ml-4 flex gap-2",
+        isDragging && "opacity-50",
+        dropLine && "drop-target",
+      )}
+    >

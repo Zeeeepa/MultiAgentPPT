@@ -199,6 +199,7 @@ export function PresentationGenerationManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, outline, language, tone, numSlides}),
       });
+      console.log("[前端] fetch /api/presentation/generate 返回", response);
       if (!response.body) throw new Error("No response body");
   
       const reader = response.body.getReader();
@@ -207,6 +208,7 @@ export function PresentationGenerationManager() {
       let done = false;
       while (!done) {
         const { value, done: streamDone } = await reader.read();
+        console.log(`[前端] 读取到chunk, 长度:`, bufferedText?.length, "done:", done);
         done = streamDone;
   
         if (value) {
