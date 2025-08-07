@@ -12,6 +12,7 @@ async def httpx_client():
         client = await A2AClient.get_client_from_agent_card_url(
             httpx_client, 'http://localhost:10001'  # 确保此处是完整 URL
         )
+        print(client.httpx_client.headers)
 
         # 生成唯一请求ID
         request_id = uuid.uuid4().hex
@@ -48,5 +49,5 @@ async def httpx_client():
 
 if __name__ == '__main__':
     prompt = """我想调研电动汽车发展"""
-    streaming = False
+    streaming = True
     asyncio.run(httpx_client())
