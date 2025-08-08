@@ -189,6 +189,7 @@ MultiAgentPPT/
 3. 安装依赖并推送数据库模型：
 
    ```bash
+   cp env_template .env
    # 安装前端依赖
    pnpm install
    # 推送数据库模型和插入用户数据
