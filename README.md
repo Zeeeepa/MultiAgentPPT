@@ -1,5 +1,8 @@
 # 🚀 MultiAgentPPT
 
+作者微信答疑解惑：
+![weichat.png](docs%2Fweichat.png)
+
 一个基于 A2A + MCP + ADK 的多智能体系统，支持流式并发生成高质量 (可在线编辑）PPT 内容。
 
 ## 🧠 一、项目简介
@@ -212,8 +215,6 @@ MultiAgentPPT/
 
 前端项目部分基于开源仓库：[allweonedev/presentation-ai](https://github.com/allweonedev/presentation-ai)
 
-## 添加作者微信答疑解惑
-johnsongzc
 
 # Star History
 
