@@ -318,6 +318,7 @@ flowchart TD
 
   * **子 Agent 描述清晰**：注册时需明确功能（例如：“Generates structured PPT outlines”），以确保 Host Agent 正确分配任务。
   * **会话管理**：建议为每个任务创建独立的会话，并使用前端的会话列表跟踪任务进度。
+  * **代理**：如果使用国内模型，建议取消的.env中的所有HTTP代理，注释掉即可。
 
 -----
 
