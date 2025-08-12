@@ -99,7 +99,7 @@ export function PresentationGenerationManager() {
         setShouldStartPresentationGeneration(false);
 
         // Get other state values needed for saving
-        const { currentPresentationId, currentPresentationTitle, theme } =
+        const { currentPresentationId, currentPresentationTitle, theme, language } =
           usePresentationState.getState();
 
         // Save the final presentation outline
@@ -109,6 +109,7 @@ export function PresentationGenerationManager() {
             outline: finalOutline, // Use the final, complete outline
             title: currentPresentationTitle ?? "",
             theme,
+            language,
           });
         }
       },
@@ -182,7 +183,7 @@ export function PresentationGenerationManager() {
   const generatePresentationStream = async ({
     title,
     outline,
-    language,
+    language: targetLanguage,
     tone,
   }: {
     title: string;
@@ -197,7 +198,7 @@ export function PresentationGenerationManager() {
       const response = await fetch("/api/presentation/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, outline, language, tone, numSlides}),
+        body: JSON.stringify({ title, outline, language: targetLanguage, tone, numSlides}),
       });
       console.log("[前端] fetch /api/presentation/generate 返回", response);
       if (!response.body) throw new Error("No response body");
@@ -274,13 +275,14 @@ export function PresentationGenerationManager() {
       slidesBufferRef.current = slides;
       slidesRafIdRef.current = requestAnimationFrame(updateSlidesWithRAF);
   
-      const { currentPresentationId, currentPresentationTitle, theme } = usePresentationState.getState();
+      const { currentPresentationId, currentPresentationTitle, theme, language } = usePresentationState.getState();
       if (currentPresentationId) {
         void updatePresentation({
           id: currentPresentationId,
           content: { slides: slides },
           title: currentPresentationTitle ?? "",
           theme,
+          language,
         });
       }
   
