@@ -203,6 +203,16 @@ MultiAgentPPT/
 ---
 
 
+## Docker部署
+```
+# 请自行检查docker-compose.yml和每个目录下的Dockerfile文件
+cd frontend
+docker compose up
+
+cd backend
+docker compose up
+```
+
 ---
 
 ## 🧪 示例数据说明

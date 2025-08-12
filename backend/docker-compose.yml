@@ -1,0 +1,48 @@
+version: "3.8"
+services:
+  ppt_agent:
+    container_name: ppt_agent
+    build:
+      context: ./slide_agent
+      dockerfile: Dockerfile_prod
+    ports:
+      - "10011:10011"
+      - "10012:10012"
+    env_file: ./slide_agent/.env
+    restart: always
+
+  ppt_outline:
+    container_name: ppt_outline
+    build:
+      context: ./slide_outline
+      dockerfile: Dockerfile_prod
+    ports:
+      - "10001:10001"
+    env_file: ./slide_outline/.env
+    restart: always
+    depends_on:
+      - rag_tool
+
+  rag_tool:
+    container_name: mcp_rag_tool
+    build:
+      context: ./slide_outline
+      dockerfile: Dockerfile_MCPRAG
+    command: fastmcp run --transport sse --port 6501 --host 0.0.0.0 mcpserver/rag_tool.py
+    ports:
+      - "6501:6501"
+    restart: always
+
+  ppt_download:
+    container_name: ppt_download
+    build: ./save_ppt
+    ports:
+      - "10021:10021"
+    restart: always
+
+  llm_cache:
+    container_name: llm_cache
+    build: ../tools
+    ports:
+      - "6688:6688"
+    restart: always
