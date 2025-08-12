@@ -81,6 +81,7 @@ model Presentation {
     imageModel        String? // The image model used for generating images
     presentationStyle String? // The style of the presentation
     language          String?      @default("en-US") // The language of the presentation
+    numSlides         Int?      @default(12)
     outline           String[] // Store the presentation outline
     base              BaseDocument @relation(fields: [id], references: [id], onDelete: Cascade)
     templateId        String?
