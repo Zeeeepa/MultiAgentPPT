@@ -13,7 +13,8 @@ export async function createPresentation(
   outline?: string[],
   imageModel?: string,
   presentationStyle?: string,
-  language?: string
+  language?: string,
+  numSlides?:number,
 ) {
   try {
     const presentation = await db.baseDocument.create({
@@ -28,6 +29,7 @@ export async function createPresentation(
             imageModel,
             presentationStyle,
             language,
+            numSlides,
             outline: outline,
           },
         },
@@ -57,11 +59,13 @@ export async function createPresentation(
 export async function createEmptyPresentation(
   title: string,
   theme = "default",
-  language?: string
+  language?: string,
+  numSlides?:number,
 ) {
   const emptyContent: { slides: PlateSlide[] } = { slides: [] };
+  console.log("numSlides=>",numSlides)
 
-  return createPresentation(emptyContent, title, theme, undefined, undefined, undefined, language);
+  return createPresentation(emptyContent, title, theme, undefined, undefined, undefined, language,numSlides);
 }
 
 export async function updatePresentation({
@@ -73,6 +77,7 @@ export async function updatePresentation({
   imageModel,
   presentationStyle,
   language,
+  numSlides,
 }: {
   id: string;
   content?: {
@@ -84,6 +89,7 @@ export async function updatePresentation({
   imageModel?: string;
   presentationStyle?: string;
   language?: string;
+  numSlides?:number
 }) {
   try {
     // Extract values from content if provided there
@@ -104,6 +110,7 @@ export async function updatePresentation({
             imageModel: effectiveImageModel,
             presentationStyle: effectivePresentationStyle,
             language: effectiveLanguage,
+            numSlides,
             outline,
           },
         },
@@ -198,13 +205,13 @@ export async function deletePresentations(ids: string[]) {
 
 // Get the presentation with the presentation content
 export async function getPresentation(id: string) {
-  try {
-    const presentation = await db.baseDocument.findUnique({
+  try { const presentation = await db.baseDocument.findUnique({
       where: { id },
       include: {
         presentation: true,
       },
     });
+
 
     return {
       success: true,

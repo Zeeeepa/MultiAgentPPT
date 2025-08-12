@@ -190,6 +190,7 @@ CHECKER_AGENT_PROMPT= """
 - 是否与前几页PPT图片的重复？
 - 图片不能是example.com的图片，需要使用真实的图片。
 - 检查幻灯片的语言是否是: {language}
+- 如果幻灯片是COLUMNS格式,不要包含<ul>标签和<li>标签
 
 请只输出以下任意一种文字：
 1. [当前第x页PPT合格]

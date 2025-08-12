@@ -37,6 +37,7 @@ export default function PresentationGenerateWithIdPage() {
     setImageModel,
     setPresentationStyle,
     setLanguage,
+    setNumSlides,
   } = usePresentationState();
 
   // Track if this is a fresh navigation or a revisit
@@ -136,6 +137,10 @@ export default function PresentationGenerateWithIdPage() {
       if (presentationData.presentation?.language) {
         setLanguage(presentationData.presentation.language);
       }
+
+      if (presentationData.presentation?.numSlides) {
+          setNumSlides(presentationData.presentation.numSlides);
+      }
     }
   }, [
     presentationData,
@@ -179,10 +184,10 @@ export default function PresentationGenerateWithIdPage() {
         <ArrowLeft className="h-4 w-4" />
         Back
       </Button>
-
       <div className="mx-auto max-w-4xl space-y-8 p-8 pt-6">
         <div className="space-y-8">
           <Header />
+
           <PromptInput />
           <OutlineList />
 
@@ -201,7 +206,7 @@ export default function PresentationGenerateWithIdPage() {
           disabled={isGeneratingPresentation}
         >
           <Wand2 className="h-5 w-5" />
-          {isGeneratingPresentation ? "Generating..." : "Generate Presentation"}
+          {isGeneratingPresentation ? "Generating..." : "生成演示文稿"}
         </Button>
       </div>
     </ThemeBackground>

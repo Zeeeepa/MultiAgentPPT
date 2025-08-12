@@ -11,11 +11,13 @@ export async function POST(req: Request) {
     if (!DOWNLOAD_SLIDES_URL) {
       return NextResponse.json({ error: "DOWNLOAD_SLIDES_URL not set" }, { status: 500 });
     }
+    const trimmedReferences = Array.isArray(references) ? references.slice(0, 30) : [];
+    console.log("Generating PPT with title:", title, "items:", items, "trimmedReferences:", trimmedReferences);
     // 调用后端PPT生成服务
     const res = await fetch(DOWNLOAD_SLIDES_URL+"/generate-ppt", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: title, sections: items, references: references || [] }),
+      body: JSON.stringify({ title: title, sections: items, references: trimmedReferences || [] }),
     });
     if (!res.ok) {
       return NextResponse.json({ error: "Failed to generate PPT" }, { status: 500 });

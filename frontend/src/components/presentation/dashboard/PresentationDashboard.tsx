@@ -25,6 +25,8 @@ export function PresentationDashboard() {
     // We'll use these instead of directly calling startOutlineGeneration
     setShouldStartOutlineGeneration,
     language,
+    numSlides,
+
   } = usePresentationState();
 
   useEffect(() => {
@@ -41,11 +43,15 @@ export function PresentationDashboard() {
       return;
     }
     setIsGeneratingOutline(true);
+    console.log('language=>',language)
+    console.log('numSlides=>',numSlides)
+
     try {
       const result = await createEmptyPresentation(
         presentationInput || "Untitled Presentation",
         "default",
-        language
+        language,
+        numSlides
       );
       console.timeEnd("createEmptyPresentation");
       if (result.success && result.presentation) {
@@ -89,11 +95,14 @@ export function PresentationDashboard() {
   return (
     <div className="notebook-section relative w-full">
       <PresentationsSidebar />
+
       <div className="mx-auto w-full max-w-4xl space-y-12 px-6 py-12">
         <PresentationHeader />
 
+
         <div className="space-y-8">
           <PresentationInput />
+
           <PresentationControls />
           <div className="flex items-center justify-end">
             <div className="flex items-center gap-2">
@@ -104,7 +113,7 @@ export function PresentationDashboard() {
                 className="gap-2"
               >
                 <Wand2 className="h-4 w-4" />
-                Generate Presentation
+               生成演示文稿
               </Button>
               <Button
                 variant="outline"

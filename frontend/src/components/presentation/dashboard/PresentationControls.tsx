@@ -28,7 +28,7 @@ export function PresentationControls({
       <div>
         {shouldShowLabel && (
           <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Number of slides
+            Slide 数量
           </label>
         )}
         <Select
@@ -39,7 +39,7 @@ export function PresentationControls({
             <SelectValue placeholder="Select number of slides" />
           </SelectTrigger>
           <SelectContent>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 15, 20, 25, 30].map((num) => (
+            {[1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 15, 16, 20, 25, 30].map((num) => (
               <SelectItem key={num} value={String(num)}>
                 {num} slides
               </SelectItem>
@@ -52,7 +52,7 @@ export function PresentationControls({
       <div>
         {shouldShowLabel && (
           <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Language
+            语言
           </label>
         )}
         <Select value={language} onValueChange={setLanguage}>
@@ -80,7 +80,7 @@ export function PresentationControls({
       <div>
         {shouldShowLabel && (
           <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Page style
+            风格
           </label>
         )}
         <Select value={pageStyle} onValueChange={setPageStyle}>
