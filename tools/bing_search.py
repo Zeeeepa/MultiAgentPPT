@@ -3,7 +3,7 @@
 # @Date  : 2025/08/13
 # @File  : tools_merged.py
 # @Author: merged by ChatGPT (based on johnson's originals)
-# @Desc  : Bing 搜索
+# @Desc  : Bing 搜索（缓存没生效)
 import os
 import json
 import asyncio
