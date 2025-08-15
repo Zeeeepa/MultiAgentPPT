@@ -4,7 +4,7 @@ services:
     container_name: ppt_agent
     build:
       context: ./slide_agent
-      dockerfile: Dockerfile_prod
+      dockerfile: Dockerfile
     ports:
       - "10011:10011"
       - "10012:10012"
@@ -15,7 +15,7 @@ services:
     container_name: ppt_outline
     build:
       context: ./slide_outline
-      dockerfile: Dockerfile_prod
+      dockerfile: Dockerfile
     ports:
       - "10001:10001"
     env_file: ./slide_outline/.env
