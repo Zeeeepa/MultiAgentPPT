@@ -184,6 +184,7 @@ MultiAgentPPT/
    DATABASE_URL="postgresql://postgres:welcome@localhost:5432/presentation_ai"
    A2A_AGENT_OUTLINE_URL="http://localhost:10001"
    A2A_AGENT_SLIDES_URL="http://localhost:10011"
+   DOWNLOAD_SLIDES_URL="http://localhost:10021"
    ```
 
 3. 安装依赖并推送数据库模型：
