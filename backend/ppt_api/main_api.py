@@ -111,7 +111,7 @@ async def generate_ppt(request: dict):
             metadata={"language": language, "numSlides": numSlides},
             agent_card_url=os.environ["SLIDES_URL"]
         )
-
+        # todo: 收集完成所有stream后，调用parse_trunk_data和generate_pptx_file生成PPT文件
         return StreamingResponse(
             stream_ppt(
                 stream_response=stream_response,

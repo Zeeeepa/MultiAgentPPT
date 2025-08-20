@@ -106,7 +106,6 @@ def generate_pptx_file(title, sections, references):
 
 def parse_trunk_data(trunk_list, references, title):
     """
-
     :param trunks: 大模型生成的结果,列表
     :return:
     """
