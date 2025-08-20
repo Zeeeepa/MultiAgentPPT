@@ -75,7 +75,8 @@ class FastAPITestCase(unittest.IsolatedAsyncioTestCase):
             "message": {
                 "sessionId": uuid4().hex,
                 "userId": 20002,
-                "prompt": "Tesla's role in accelerating the world's transition to sustainable energy"
+                "prompt": "Tesla's role in accelerating the world's transition to sustainable energy",
+                "language": "English"
             }
         }
 

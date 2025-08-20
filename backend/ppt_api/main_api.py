@@ -65,19 +65,9 @@ async def generate_outline(request: dict):
         message = request["message"]
         session_id = message["sessionId"]
         user_id = message["userId"]
-        function_id = message["functionId"]
-        link_id = message.get("linkId")
         prompt = message["prompt"]
-        attachment = message.get("attachment", {})
-
-        attachment_doclist = attachment.get("docList", [])
-        language = attachment.get("language", "chinese")
-        select_time = attachment.get("time", [])
-        if attachment_doclist:
-            pmids = [doc["pmid"] for doc in attachment_doclist]
-            metadata = {"pmids": pmids, "language": language, "select_time": select_time}
-        else:
-            metadata = {"language": language, "select_time": select_time}
+        language = message.get("language", "chinese")
+        metadata = {"language": language}
 
         stream_response = send_outline_prompt_streaming(
             prompt=prompt,
@@ -100,24 +90,19 @@ async def generate_ppt(request: dict):
         message = request["message"]
         session_id = message["sessionId"]
         user_id = message["userId"]
-        function_id = message["functionId"]
-        link_id = message.get("linkId")
         prompt = message["prompt"]
-        attachment = message.get("attachment", {})
-
+        language = message.get("language", "chinese")
+        numSlides = message.get("numSlides", 12)
         if isinstance(prompt, str):
             prompt_data = json.loads(prompt)
         else:
             prompt_data = prompt
-        pmids = prompt_data.get("pmidList", [])
         outline = data_to_markdown(data=prompt_data["data"])
         title = prompt_data["data"][0]['content']
-        language = attachment.get("language", "chinese")
-        select_time = attachment.get("time", [])
 
         stream_response = send_ppt_outline_streaming(
             outline=outline,
-            metadata={"language": language, "numSlides": 12, "pmids": pmids, "select_time": select_time},
+            metadata={"language": language, "numSlides": numSlides},
             agent_card_url=os.environ["SLIDES_URL"]
         )
 
