@@ -11,6 +11,7 @@ from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import JSONResponse
+from fastapi.responses import StreamingResponse
 from a2a_client import send_outline_prompt_streaming, send_ppt_outline_streaming
 from markdown_convert_json import markdown_to_json, data_to_markdown
 from xml_convert_json import parse_trunk_data
@@ -31,7 +32,7 @@ app = FastAPI(title="InfoXMed API", version="1.0")
 # ==================================================
 # 工具函数
 # ==================================================
-async def stream_outline(link_id, session_id, user_id, function_id, attachment, stream_response):
+async def stream_outline(stream_response):
     """处理大纲流式响应"""
     try:
         async for chunk in stream_response:
@@ -41,7 +42,7 @@ async def stream_outline(link_id, session_id, user_id, function_id, attachment, 
         traceback.print_exc()
         yield {"error": str(e)}
 
-async def stream_ppt(link_id, session_id, user_id, function_id, attachment, stream_response, title):
+async def stream_ppt(stream_response):
     """处理PPT流式响应"""
     try:
         async for chunk in stream_response:
@@ -75,7 +76,12 @@ async def generate_outline(request: dict):
             agent_card_url=os.environ["OUTLINE_URL"]
         )
 
-        return JSONResponse(content={"status": "started", "sessionId": session_id, "userId": user_id, "functionId": function_id})
+        return StreamingResponse(
+            stream_outline(
+                stream_response=stream_response
+            ),
+            media_type="application/json"
+        )
     except Exception as e:
         logger.error(f"生成大纲出错: {e}")
         return JSONResponse(content={"error": str(e)}, status_code=500)
@@ -106,7 +112,12 @@ async def generate_ppt(request: dict):
             agent_card_url=os.environ["SLIDES_URL"]
         )
 
-        return JSONResponse(content={"status": "started", "sessionId": session_id, "userId": user_id, "functionId": function_id})
+        return StreamingResponse(
+            stream_ppt(
+                stream_response=stream_response,
+            ),
+            media_type="application/json"
+        )
     except Exception as e:
         logger.error(f"生成PPT出错: {e}")
         return JSONResponse(content={"error": str(e)}, status_code=500)

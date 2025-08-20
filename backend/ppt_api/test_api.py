@@ -17,9 +17,29 @@ class FastAPITestCase(unittest.IsolatedAsyncioTestCase):
     """
     测试 FastAPI API
     """
-    BASE_URL = "http://localhost:8000"
+    BASE_URL = "http://localhost:6999"
     if os.environ.get("FASTAPI_URL"):
         BASE_URL = os.environ.get("FASTAPI_URL")
+
+    async def test_generate_outline(self):
+        """
+        测试 /outline 接口（特斯拉大纲）
+        """
+        url = f"{self.BASE_URL}/outline"
+        payload = {
+            "message": {
+                "sessionId": uuid4().hex,
+                "userId": 20002,
+                "prompt": "Tesla's role in accelerating the world's transition to sustainable energy",
+                "language": "English"
+            }
+        }
+
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(url, json=payload)
+            print("Outline接口返回结果:", resp.json())
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("status", resp.json())
 
     async def test_generate_ppt(self):
         """
@@ -63,26 +83,6 @@ class FastAPITestCase(unittest.IsolatedAsyncioTestCase):
         async with httpx.AsyncClient(timeout=30) as client:
             resp = await client.post(url, json=payload)
             print("PPT接口返回结果:", resp.json())
-            self.assertEqual(resp.status_code, 200)
-            self.assertIn("status", resp.json())
-
-    async def test_generate_outline(self):
-        """
-        测试 /outline 接口（特斯拉大纲）
-        """
-        url = f"{self.BASE_URL}/outline"
-        payload = {
-            "message": {
-                "sessionId": uuid4().hex,
-                "userId": 20002,
-                "prompt": "Tesla's role in accelerating the world's transition to sustainable energy",
-                "language": "English"
-            }
-        }
-
-        async with httpx.AsyncClient(timeout=30) as client:
-            resp = await client.post(url, json=payload)
-            print("Outline接口返回结果:", resp.json())
             self.assertEqual(resp.status_code, 200)
             self.assertIn("status", resp.json())
 
