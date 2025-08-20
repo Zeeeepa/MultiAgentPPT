@@ -1,0 +1,13 @@
+httpx
+python-dotenv
+asyncclick
+pytest
+pika
+supervisor
+numpy<2.0.0
+requests
+beautifulsoup4
+openai
+a2a-sdk==0.2.5
+Markdown
+lxml
