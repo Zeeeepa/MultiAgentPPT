@@ -36,21 +36,21 @@ async def stream_outline(stream_response):
     """处理大纲流式响应"""
     try:
         async for chunk in stream_response:
-            yield chunk
+            yield json.dumps(chunk, ensure_ascii=False)
     except Exception as e:
         logger.error(f"[错误] 大纲流消费失败: {e}")
         traceback.print_exc()
-        yield {"error": str(e)}
+        yield json.dumps({"error": str(e)})
 
 async def stream_ppt(stream_response):
     """处理PPT流式响应"""
     try:
         async for chunk in stream_response:
-            yield chunk
+            yield json.dumps(chunk, ensure_ascii=False)
     except Exception as e:
         logger.error(f"[错误] PPT流消费失败: {e}")
         traceback.print_exc()
-        yield {"error": str(e)}
+        yield json.dumps({"error": str(e)})
 
 # ==================================================
 # FastAPI 接口
