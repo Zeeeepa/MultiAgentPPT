@@ -4,40 +4,11 @@ import json
 import markdown
 from bs4 import BeautifulSoup
 
-md_text = """# Clinical Research and Therapeutic Application Progress of Ivonescimab in Non-Small Cell Lung Cancer (NSCLC)
-
-## Introduction
-- Overview of NSCLC epidemiology and therapeutic challenges
-- Rationale for targeting PD-1 and VEGF pathways
-- Emergence of bispecific antibodies in NSCLC treatment
-
-## Mechanism and Pharmacology of Ivonescimab
-- Bispecific architecture: simultaneous inhibition of PD-1 and VEGF-A/VEGFR2
-- Cooperative binding effects enhancing efficacy over monotherapies
-- Preclinical pharmacokinetics, pharmacodynamics, and safety data
-- Fc-silencing mutations and implications for safety profile
-
-## Clinical Development and Efficacy Outcomes
-### HARMONi-A and Other Key Trials in EGFR-mutated NSCLC
-- Phase 3 trial design: ivonescimab plus chemotherapy vs. chemotherapy in EGFR-mutated patients post-TKI progression
-- Significant improvement in progression-free survival (PFS): median 7.1 vs. 4.8 months, HR 0.46
-- Objective response rate (ORR) enhancements and subgroup benefits (third-generation TKI resistance, brain metastasis)
-- Manageable safety profile (grade ≥3 AEs, immune-mediated, VEGF-associated)
-
-### HARMONi-2: First-line in PD-L1 Positive Advanced NSCLC
-- Comparison between ivonescimab and pembrolizumab in untreated PD-L1-positive cases
-- Doubling of median PFS with ivonescimab (11.1 vs. 5.8 months; HR 0.51)
-- Consistent benefit across PD-L1 expression levels and histologies
-- Safety signals: grade 3–4 adverse event rates compared to established agents
-"""
-
 def markdown_to_json(markdown_text: str) -> dict:
     """
     将 Markdown 文本解析为结构化 JSON 格式。
-
     参数:
         markdown_text (str): 原始 Markdown 文本
-
     返回:
         dict: 包含层级结构的 JSON 对象
     """
@@ -139,32 +110,74 @@ if __name__ == '__main__':
     # data = markdown_to_json(md_text)
     # 步骤2，变成2层结构
     # print(json.dumps(data, indent=2, ensure_ascii=False))
-
     data = [
-        {'child': [], 'content': 'CAR-T细胞疗法在实体瘤治疗中的挑战与进展'},
-        {'child': [{'content': 'CAR-T细胞的基本原理和发展历程'},
-                   {'content': 'CAR-T细胞疗法在血液肿瘤中的成功应用'},
-                   {'content': 'CAR-T细胞疗法在实体瘤中的应用现状'}],
-         'content': 'CAR-T细胞疗法概述'},
-        {'child': [{'content': '实体瘤中抗原异质性和抗原逃逸问题'},
-                   {'content': '肿瘤微环境对CAR-T细胞的抑制作用'},
-                   {'content': 'CAR-T细胞在实体瘤中的浸润和持久性问题'},
-                   {'content': '实体瘤中CAR-T细胞疗法的毒性和安全性问题'}],
-         'content': '实体瘤中CAR-T细胞疗法的挑战'},
-        {'child': [{'content': '新型CAR结构设计与优化'},
-                   {'content': '多靶点CAR-T细胞疗法的研究进展'},
-                   {'content': 'CAR-T细胞与其他治疗手段的联合应用'}],
-         'content': 'CAR-T细胞疗法在实体瘤中的最新进展'},
-        {'child': [{'content': '增强CAR-T细胞的持久性和细胞毒性'},
-                   {'content': '克服肿瘤微环境限制的策略'},
-                   {'content': '新型合成生物学受体的调控'}],
-         'content': '提高CAR-T细胞疗法效果的策略'},
-        {'child': [{'content': 'CAR-T细胞疗法在实体瘤中的发展趋势'},
-                   {'content': '未来CAR-T细胞疗法面临的机遇与挑战'},
-                   {'content': 'CAR-T细胞疗法的临床应用前景'}],
-         'content': 'CAR-T细胞疗法的未来展望'}
+        {'child': [], 'content': '特斯拉汽车的技术与发展概述'},
+        {'child': [{'content': '特斯拉的创立背景与使命'},
+                   {'content': '电动汽车产业的变革与特斯拉的引领作用'},
+                   {'content': '可持续能源战略与发展愿景'}],
+         'content': '特斯拉公司概述'},
+        {'child': [{'content': '动力电池的技术突破与能量密度提升'},
+                   {'content': '超级充电网络的建设与全球布局'},
+                   {'content': '电驱动系统的性能与效率优化'},
+                   {'content': '软件与OTA远程升级的独特优势'}],
+         'content': '核心技术与创新'},
+        {'child': [{'content': '自动驾驶系统（Autopilot/FSD）的演进'},
+                   {'content': '人工智能与大数据在自动驾驶中的应用'},
+                   {'content': '传感器与芯片硬件平台的发展'},
+                   {'content': '自动驾驶安全性与监管挑战'}],
+         'content': '自动驾驶与智能化'},
+        {'child': [{'content': 'Cybertruck、Roadster 等新车型的研发'},
+                   {'content': '4680 电池产业化进展'},
+                   {'content': '能源产品（Powerwall、Megapack）的市场拓展'}],
+         'content': '产品线与产业布局'},
+        {'child': [{'content': '全球工厂（上海、柏林、德州）的扩张与产能提升'},
+                   {'content': '供应链管理与原材料战略'},
+                   {'content': '全球市场竞争与政策环境'}],
+         'content': '全球化与产业生态'},
+        {'child': [{'content': '未来在电动化与智能化的持续突破'},
+                   {'content': '能源生态系统的一体化发展'},
+                   {'content': '在全球碳中和目标中的作用与影响'}],
+         'content': '未来展望'}
     ]
 
     markdown_text = data_to_markdown(data)
     print(markdown_text)
+
+    md_text = """
+# 特斯拉汽车的技术与发展概述
+
+## 特斯拉公司概述
+- 特斯拉的创立背景与使命
+- 电动汽车产业的变革与特斯拉的引领作用
+- 可持续能源战略与发展愿景
+
+## 核心技术与创新
+- 动力电池的技术突破与能量密度提升
+- 超级充电网络的建设与全球布局
+- 电驱动系统的性能与效率优化
+- 软件与OTA远程升级的独特优势
+
+## 自动驾驶与智能化
+- 自动驾驶系统（Autopilot/FSD）的演进
+- 人工智能与大数据在自动驾驶中的应用
+- 传感器与芯片硬件平台的发展
+- 自动驾驶安全性与监管挑战
+
+## 产品线与产业布局
+- Cybertruck、Roadster 等新车型的研发
+- 4680 电池产业化进展
+- 能源产品（Powerwall、Megapack）的市场拓展
+
+## 全球化与产业生态
+- 全球工厂（上海、柏林、德州）的扩张与产能提升
+- 供应链管理与原材料战略
+- 全球市场竞争与政策环境
+
+## 未来展望
+- 未来在电动化与智能化的持续突破
+- 能源生态系统的一体化发展
+- 在全球碳中和目标中的作用与影响
+    """
+    print(markdown_to_json(markdown_text=md_text))
+
 
